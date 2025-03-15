@@ -181,12 +181,6 @@ body {
   align-items: center;
 }
 
-.breadcrumb-item:not(:last-child)::after {
-  content: '/';
-  margin: 0 8px;
-  color: var(--text-color-secondary);
-}
-
 .breadcrumb-item a {
   color: var(--text-color-secondary);
   text-decoration: none;
@@ -245,7 +239,7 @@ body {
 /* 内容区域 */
 .content {
   padding: 20px;
-  margin-top: 60px; /* 为固定的顶部导航栏留出空间 */
+  margin-top: 10px; /* 为固定的顶部导航栏留出空间 */
 }
 
 /* 页面标题 */
@@ -675,4 +669,27 @@ body {
 .file-upload-area.dragover {
   background-color: rgba(58, 142, 230, 0.05);
   border-color: var(--primary-color);
+}
+
+/* 顶部导航栏固定定位样式 */
+.top-navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 220px; /* 侧边栏宽度 */
+  z-index: 1000;
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  padding: 10px 20px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .top-navbar {
+    left: 0;
+  }
+  
+  .sidebar.show + .main-content .top-navbar {
+    left: 220px;
+  }
 } 
