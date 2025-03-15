@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Logs
+logs/
+*.log
+app.log
+
+# Maven
+target/
+.mvn/
+mvnw
+mvnw.cmd
+
+# Others
+.DS_Store
+README.md
+HELP.md
+cookies.txt
+
+# Docker
+Dockerfile
+.dockerignore 

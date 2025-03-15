@@ -1,7 +1,0 @@
-/Users/andrew/home/javahome/workspace/springDemo/springdemo-batch/src/main/java/com/example/springdemo/batch/reader/UserCsvReader.java
-/Users/andrew/home/javahome/workspace/springDemo/springdemo-batch/src/main/java/com/example/springdemo/batch/listener/JobCompletionNotificationListener.java
-/Users/andrew/home/javahome/workspace/springDemo/springdemo-batch/src/main/java/com/example/springdemo/batch/writer/UserItemWriter.java
-/Users/andrew/home/javahome/workspace/springDemo/springdemo-batch/src/main/java/com/example/springdemo/batch/config/BatchConfig.java
-/Users/andrew/home/javahome/workspace/springDemo/springdemo-batch/src/main/java/com/example/springdemo/batch/model/User.java
-/Users/andrew/home/javahome/workspace/springDemo/springdemo-batch/src/main/java/com/example/springdemo/batch/processor/UserItemProcessor.java
-/Users/andrew/home/javahome/workspace/springDemo/springdemo-batch/src/main/java/com/example/springdemo/batch/controller/BatchController.java
