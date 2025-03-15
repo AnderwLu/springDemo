@@ -1,0 +1,7 @@
+com/example/springdemo/batch/controller/BatchController.class
+com/example/springdemo/batch/model/User.class
+com/example/springdemo/batch/listener/JobCompletionNotificationListener.class
+com/example/springdemo/batch/processor/UserItemProcessor.class
+com/example/springdemo/batch/reader/UserCsvReader.class
+com/example/springdemo/batch/config/BatchConfig.class
+com/example/springdemo/batch/writer/UserItemWriter.class

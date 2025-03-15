@@ -1,0 +1,4 @@
+username,password,email,phone,realName,age,gender,address,role
+testuser1,password123,test1@example.com,13800138001,张三,30,男,北京市海淀区,ROLE_USER
+testuser2,password456,test2@example.com,13800138002,李四,28,女,上海市浦东新区,ROLE_USER
+adminuser,admin123,admin@example.com,13900139001,管理员,35,男,广州市天河区,ROLE_ADMIN
