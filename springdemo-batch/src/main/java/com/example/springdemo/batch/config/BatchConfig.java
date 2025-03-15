@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.sql.DataSource;
 
 /**
  * Spring Batch配置类
@@ -34,8 +33,6 @@ public class BatchConfig {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
-    private DataSource dataSource;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
