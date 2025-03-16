@@ -1,135 +1,128 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpringDemo管理系统</title>
-    <!-- 引入Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- 引入Font Awesome图标 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- 引入自定义样式 -->
-    <link href="/springdemo/css/admin.css" rel="stylesheet">
-    <link href="/springdemo/css/styles.css" rel="stylesheet">
-    
-</head>
-<body>
-    <div id="app">
-        <div class="admin-container">
-            <!-- 侧边栏 -->
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    SpringDemo 控制台
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SpringDemo管理系统</title>
+        <!-- 引入Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- 引入Font Awesome图标 -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+        <!-- 引入自定义样式 -->
+        <link href="/springdemo/css/admin.css" rel="stylesheet" />
+        <link href="/springdemo/css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div id="app">
+            <div class="admin-container">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-header">SpringDemo 控制台</div>
+                    <ul class="sidebar-menu">
+                        <li class="menu-item" :class="{ active: active === 'dashboard' }">
+                            <a href="#/dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>仪表盘</span>
+                            </a>
+                        </li>
+                        <li class="menu-item" :class="{ active: active === 'users' }">
+                            <a href="#/users">
+                                <i class="fas fa-users"></i>
+                                <span>用户管理</span>
+                            </a>
+                        </li>
+                        <li class="menu-item" :class="{ active: active === 'batch' }">
+                            <a href="#/batch">
+                                <i class="fas fa-tasks"></i>
+                                <span>批处理管理</span>
+                            </a>
+                        </li>
+                        <li class="menu-item" :class="{ active: active === 'monitor', open: active === 'monitor' }">
+                            <a href="javascript:void(0);" @click="toggleSubmenu('monitor')">
+                                <i class="fas fa-chart-line"></i>
+                                <span>监控模块</span>
+                                <span class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item" :class="{ active: subActive === 'realtime' }">
+                                    <a href="#/monitor/realtime">实时监控</a>
+                                </li>
+                                <li class="submenu-item" :class="{ active: subActive === 'logs' }">
+                                    <a href="#/monitor/logs">日志查看</a>
+                                </li>
+                                <li class="submenu-item" :class="{ active: subActive === 'metrics' }">
+                                    <a href="#/monitor/metrics">性能指标</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="menu-item" :class="{ active: active === 'settings' }">
+                            <a href="#/settings">
+                                <i class="fas fa-cog"></i>
+                                <span>系统设置</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <ul class="sidebar-menu">
-                    <li class="menu-item" :class="{ active: active === 'home' }">
-                        <a href="#/">
-                            <i class="fas fa-home"></i>
-                            <span>首页</span>
-                        </a>
-                    </li>
-                    <li class="menu-item" :class="{ active: active === 'dashboard' }">
-                        <a href="#/dashboard">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>仪表盘</span>
-                        </a>
-                    </li>
-                    <li class="menu-item" :class="{ active: active === 'users' }">
-                        <a href="#/users">
-                            <i class="fas fa-users"></i>
-                            <span>用户管理</span>
-                        </a>
-                    </li>
-                    <li class="menu-item" :class="{ active: active === 'batch' }">
-                        <a href="#/batch">
-                            <i class="fas fa-tasks"></i>
-                            <span>批处理管理</span>
-                        </a>
-                    </li>
-                    <li class="menu-item" :class="{ active: active === 'monitor', open: active === 'monitor' }">
-                        <a href="javascript:void(0);" @click="toggleSubmenu('monitor')">
-                            <i class="fas fa-chart-line"></i>
-                            <span>监控模块</span>
-                            <span class="menu-arrow">
-                                <i class="fas fa-chevron-right"></i>
-                            </span>
-                        </a>
-                        <ul class="submenu">
-                            <li class="submenu-item" :class="{ active: subActive === 'realtime' }">
-                                <a href="#/monitor/realtime">实时监控</a>
-                            </li>
-                            <li class="submenu-item" :class="{ active: subActive === 'logs' }">
-                                <a href="#/monitor/logs">日志查看</a>
-                            </li>
-                            <li class="submenu-item" :class="{ active: subActive === 'metrics' }">
-                                <a href="#/monitor/metrics">性能指标</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-item" :class="{ active: active === 'settings' }">
-                        <a href="#/settings">
-                            <i class="fas fa-cog"></i>
-                            <span>系统设置</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
 
-            <!-- 主内容区 -->
-            <div class="main-content">
-                <!-- 顶部导航栏 -->
-                <div class="top-navbar">
-                    <div class="breadcrumb">
-                        <div class="breadcrumb-item" v-if="active !== 'home'">
-                            <a href="#/">首页</a>
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航栏 -->
+                    <div class="top-navbar">
+                        <div class="breadcrumb">
+                            <div class="breadcrumb-item" v-if="active !== 'home'">
+                                <a href="#/">首页</a>
+                            </div>
+                            <div v-for="(breadcrumb, index) in breadcrumbs" :key="index" class="breadcrumb-item" :class="{ active: breadcrumb.active }">
+                                <a v-if="!breadcrumb.active" :href="'#' + breadcrumb.url">{{ breadcrumb.name }}</a>
+                                <span v-if="breadcrumb.active">{{ breadcrumb.name }}</span>
+                            </div>
                         </div>
-                        <div v-for="(breadcrumb, index) in breadcrumbs" :key="index" 
-                             class="breadcrumb-item" :class="{ active: breadcrumb.active }">
-                            <a v-if="!breadcrumb.active" :href="'#' + breadcrumb.url">{{ breadcrumb.name }}</a>
-                            <span v-if="breadcrumb.active">{{ breadcrumb.name }}</span>
-                        </div>
-                    </div>
-                    <div class="user-menu">
-                        <div class="dropdown">
-                            <span>
-                                <i class="fas fa-user-circle"></i>
-                                <span>{{ username || '管理员' }}</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </span>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#/profile">
-                                    <i class="fas fa-user"></i> 个人信息
-                                </a>
-                                <a class="dropdown-item" href="/springdemo/logout">
-                                    <i class="fas fa-sign-out-alt"></i> 退出登录
-                                </a>
+                        <div class="user-menu">
+                            <div class="dropdown">
+                                <span>
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>{{ username || '管理员' }}</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </span>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#/profile">
+                                        <i class="fas fa-user"></i>
+                                        个人信息
+                                    </a>
+                                    <a class="dropdown-item" href="/springdemo/logout">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        退出登录
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 内容区域 -->
-                <div class="content">
-                    <component :is="currentView" 
-                               :system-info="systemInfo"
-                               :breadcrumbs="breadcrumbs"></component>
+                    <!-- 内容区域 -->
+                    <div class="content">
+                        <component :is="currentView" :system-info="systemInfo" :breadcrumbs="breadcrumbs"></component>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- 引入Vue.js -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.36/dist/vue.global.min.js"></script>
-    <!-- 引入Axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- 引入jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- 引入Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- 引入Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- 使用ES模块导入主应用脚本 -->
-    <script type="module" src="/springdemo/js/app.js"></script>
-</body>
-</html> 
+        <!-- 引入Vue.js -->
+        <script src="https://cdn.jsdelivr.net/npm/vue@3.2.36/dist/vue.global.min.js"></script>
+        <!-- 引入Axios -->
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <!-- 引入jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- 引入Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- 引入Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <!-- 模板容器 -->
+        <div id="templates" style="display: none"></div>
+
+        <!-- 使用ES模块导入主应用脚本 -->
+        <script type="module" src="/springdemo/js/app.js"></script>
+    </body>
+</html>
