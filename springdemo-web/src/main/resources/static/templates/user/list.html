@@ -24,7 +24,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="d-flex gap-3 justify-content-center mt-3">
+                        <div class="d-flex justify-content-center gap-3 mt-3">
                             <button class="btn btn-success" style="min-width: 120px; height: 40px" type="button">
                                 <i class="fas fa-plus me-1"></i>
                                 新增
@@ -36,6 +36,15 @@
                             <button class="btn btn-outline-secondary" style="min-width: 120px; height: 40px; background-color: #ebedf3; color: #7e8299; border-color: #e4e6ef" @click="resetSearch">
                                 <i class="fas fa-redo me-1"></i>
                                 重置
+                            </button>
+                            <div class="border-start mx-2" style="height: 24px; margin-top: 8px"></div>
+                            <button class="btn btn-outline-primary" style="min-width: 100px; height: 40px; background-color: #e1f0ff; color: #3699ff; border-color: #e1f0ff" @click="handleImport" title="导入Excel文件">
+                                <i class="fas fa-file-import me-1"></i>
+                                导入
+                            </button>
+                            <button class="btn btn-outline-primary" style="min-width: 100px; height: 40px; background-color: #e1f0ff; color: #3699ff; border-color: #e1f0ff" @click="handleExport" title="导出Excel文件">
+                                <i class="fas fa-file-export me-1"></i>
+                                导出
                             </button>
                         </div>
                     </div>
