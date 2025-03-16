@@ -17,7 +17,22 @@ export default {
                 size: 10,
                 totalElements: 0,
                 totalPages: 0
-            }
+            },
+            editingUser: null,
+            showEditModal: false,
+            newUser: {
+                username: '',
+                realName: '',
+                email: '',
+                phone: '',
+                gender: '男',
+                age: null,
+                address: '',
+                password: '',
+                role: 'ROLE_USER',
+                enabled: true
+            },
+            showAddModal: false
         };
     },
     methods: {
@@ -134,8 +149,77 @@ export default {
             }
         },
         async handleEdit(user) {
-            // TODO: 实现编辑用户功能
-            console.log('编辑用户:', user);
+            try {
+                // 克隆用户对象，避免直接修改列表中的数据
+                this.editingUser = { ...user };
+                this.showEditModal = true;
+            } catch (err) {
+                console.error('编辑用户失败:', err);
+                this.error = '编辑用户失败: ' + err.message;
+            }
+        },
+        async handleDelete(user) {
+            try {
+                if (!confirm('确定要删除该用户吗？')) {
+                    return;
+                }
+
+                const response = await fetch(`/springdemo/api/users/${user.id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('删除用户失败');
+                }
+
+                const result = await response.json();
+                if (result.code === 200) {
+                    // 删除成功后刷新列表
+                    this.fetchUsers();
+                } else {
+                    throw new Error(result.message || '删除用户失败');
+                }
+            } catch (err) {
+                console.error('删除用户失败:', err);
+                this.error = '删除用户失败: ' + err.message;
+            }
+        },
+        async handleSaveEdit() {
+            try {
+                if (!this.editingUser) return;
+
+                if (!this.validateUser(this.editingUser)) {
+                    return;
+                }
+
+                const response = await fetch(`/springdemo/api/users/${this.editingUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.editingUser)
+                });
+
+                if (!response.ok) {
+                    throw new Error('更新用户失败');
+                }
+
+                const result = await response.json();
+                if (result.code === 200) {
+                    this.showEditModal = false;
+                    this.editingUser = null;
+                    this.fetchUsers();
+                } else {
+                    throw new Error(result.message || '更新用户失败');
+                }
+            } catch (err) {
+                console.error('更新用户失败:', err);
+                this.error = '更新用户失败: ' + err.message;
+            }
+        },
+        handleCancelEdit() {
+            this.showEditModal = false;
+            this.editingUser = null;
         },
         async handleToggleStatus(user) {
             try {
@@ -155,6 +239,89 @@ export default {
                 console.error('更新用户状态失败:', err);
                 this.error = '更新用户状态失败: ' + err.message;
             }
+        },
+        handleAdd() {
+            this.newUser = {
+                username: '',
+                realName: '',
+                email: '',
+                phone: '',
+                gender: '男',
+                age: null,
+                address: '',
+                password: '',
+                role: 'ROLE_USER',
+                enabled: true
+            };
+            this.showAddModal = true;
+        },
+        handleCancelAdd() {
+            this.showAddModal = false;
+            this.newUser = {
+                username: '',
+                realName: '',
+                email: '',
+                phone: '',
+                gender: '男',
+                age: null,
+                address: '',
+                password: '',
+                role: 'ROLE_USER',
+                enabled: true
+            };
+        },
+        async handleSaveAdd() {
+            try {
+                if (!this.validateUser(this.newUser)) {
+                    return;
+                }
+
+                const response = await fetch('/springdemo/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.newUser)
+                });
+
+                if (!response.ok) {
+                    throw new Error('创建用户失败');
+                }
+
+                const result = await response.json();
+                if (result.code === 200) {
+                    this.showAddModal = false;
+                    this.handleCancelAdd(); // 清空表单
+                    this.fetchUsers(); // 刷新列表
+                } else {
+                    throw new Error(result.message || '创建用户失败');
+                }
+            } catch (err) {
+                console.error('创建用户失败:', err);
+                this.error = '创建用户失败: ' + err.message;
+            }
+        },
+        validateUser(user) {
+            if (!user.username) {
+                this.error = '用户名不能为空';
+                return false;
+            }
+            if (!user.password && !user.id) {
+                // 新增时密码必填
+                this.error = '密码不能为空';
+                return false;
+            }
+            if (!user.email) {
+                this.error = '邮箱不能为空';
+                return false;
+            }
+            if (!user.realName) {
+                this.error = '真实姓名不能为空';
+                return false;
+            }
+            // 清除错误提示
+            this.error = null;
+            return true;
         }
     },
     mounted() {
