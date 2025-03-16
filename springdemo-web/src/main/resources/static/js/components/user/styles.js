@@ -63,7 +63,6 @@ export default {
 
         /* 表格样式优化 */
         .table {
-            width: 100%;
             margin-bottom: 0;
             border-collapse: separate;
             border-spacing: 0;
@@ -74,7 +73,7 @@ export default {
         .table > thead > tr > th {
             white-space: nowrap;
             background-color: #f8f9fa;
-            font-weight: 500;
+            font-weight: 700;
             padding: 1rem 0.75rem;
             border: none;
             border-bottom: 2px solid #e5e7eb;
@@ -124,56 +123,7 @@ export default {
             white-space: nowrap;
         }
 
-        /* 固定宽度列 */
-        .table .col-id {
-            width: 80px;
-            min-width: 80px;
-        }
-
-        .table .col-username {
-            width: 120px;
-            min-width: 120px;
-        }
-
-        .table .col-realname {
-            width: 100px;
-            min-width: 100px;
-        }
-
-        .table .col-email {
-            width: 200px;
-            min-width: 200px;
-        }
-
-        .table .col-phone {
-            width: 120px;
-            min-width: 120px;
-        }
-
-        .table .col-gender {
-            width: 80px;
-            min-width: 80px;
-        }
-
-        .table .col-age {
-            width: 80px;
-            min-width: 80px;
-        }
-
-        .table .col-address {
-            min-width: 200px;
-        }
-
-        .table .col-role,
-        .table .col-status {
-            width: 100px;
-            min-width: 100px;
-        }
-
-        .table .col-actions {
-            width: 120px;
-            min-width: 120px;
-        }
+       
 
         /* Badge样式 */
         .badge {
