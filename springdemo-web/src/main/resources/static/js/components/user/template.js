@@ -1,3 +1,4 @@
+export default `
 <div class="user-management">
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3">
@@ -260,4 +261,4 @@
             <div class="modal-backdrop fade show" v-if="showEditModal"></div>
         </div>
     </div>
-</div>
+</div>`;

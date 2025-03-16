@@ -2,8 +2,8 @@
 import Home from './components/Home.js';
 import Dashboard from './components/Dashboard.js';
 import Settings from './components/Settings.js';
-import User from './components/user.js';
-import Batch from './components/batch/index.js';
+import User from './components/user/User.js';
+import Batch from './components/batch/Batch.js';
 
 const { markRaw } = Vue;
 // 简单的路由实现

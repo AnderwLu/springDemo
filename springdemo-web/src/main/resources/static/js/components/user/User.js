@@ -1,8 +1,11 @@
-// 导入Vue的必要函数
+import template from './template.js';
+import styles from './styles.js';
 
-export default {
+const { defineComponent } = Vue;
+
+export default defineComponent({
     name: 'UserManagement',
-    template: '#user-list',
+    template,
     data() {
         return {
             users: [],
@@ -325,6 +328,13 @@ export default {
         }
     },
     mounted() {
+        // 添加样式到页面
+        if (!document.getElementById('user-management-styles')) {
+            const styleElement = document.createElement('style');
+            styleElement.id = 'user-management-styles';
+            styleElement.textContent = styles.styles;
+            document.head.appendChild(styleElement);
+        }
         this.fetchUsers();
     }
-};
+});

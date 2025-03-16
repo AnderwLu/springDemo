@@ -27,8 +27,7 @@ class TemplateLoader {
             const templateConfigs = [
                 { path: '/springdemo/templates/dashboard.html', id: 'dashboard-template' },
                 { path: '/springdemo/templates/home.html', id: 'home-template' },
-                { path: '/springdemo/templates/settings.html', id: 'settings-template' },
-                { path: '/springdemo/templates/user/list.html', id: 'user-list' }
+                { path: '/springdemo/templates/settings.html', id: 'settings-template' }
             ];
 
             // 创建批处理模板
@@ -37,6 +36,13 @@ class TemplateLoader {
             batchTemplate.type = 'text/x-template';
             batchTemplate.innerHTML = (await import('./components/batch/template.js')).default;
             this.templates.set('batch-template', batchTemplate);
+
+            // 创建用户管理模板
+            const userTemplate = document.createElement('script');
+            userTemplate.id = 'user-template';
+            userTemplate.type = 'text/x-template';
+            userTemplate.innerHTML = (await import('./components/user/template.js')).default;
+            this.templates.set('user-template', userTemplate);
 
             // 加载其他模板
             await Promise.all(templateConfigs.map(config => this.loadTemplate(config.path, config.id)));
