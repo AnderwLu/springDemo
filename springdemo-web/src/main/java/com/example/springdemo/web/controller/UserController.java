@@ -5,6 +5,8 @@ import com.example.springdemo.dao.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,10 +32,14 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getUsers(
             @RequestParam(required = false) String username,
-            @RequestParam(required = false) String email) {
+            @RequestParam(required = false) String email,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<User> users;
+            // 创建分页请求
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<User> userPage;
             
             if (username != null || email != null) {
                 // 创建查询条件
@@ -47,18 +53,27 @@ public class UserController {
                         .withIgnoreCase()
                         .withIgnoreNullValues();
                 
-                // 执行查询
-                users = userRepository.findAll(Example.of(probe, matcher));
+                // 执行分页查询
+                userPage = userRepository.findAll(Example.of(probe, matcher), pageRequest);
             } else {
-                users = userRepository.findAll();
+                userPage = userRepository.findAll(pageRequest);
             }
             
             // 处理密码，不返回给前端
-            users.forEach(user -> user.setPassword("[PROTECTED]"));
+            userPage.getContent().forEach(user -> user.setPassword("[PROTECTED]"));
+            
+            // 构建分页响应数据
+            Map<String, Object> pageData = new HashMap<>();
+            pageData.put("content", userPage.getContent());
+            pageData.put("totalElements", userPage.getTotalElements());
+            pageData.put("totalPages", userPage.getTotalPages());
+            pageData.put("number", userPage.getNumber());
+            pageData.put("size", userPage.getSize());
             
             response.put("code", 200);
             response.put("message", "获取用户列表成功");
-            response.put("data", users);
+            response.put("data", pageData);
+            
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("code", 500);
