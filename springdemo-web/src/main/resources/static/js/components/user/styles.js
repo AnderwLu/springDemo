@@ -1,30 +1,70 @@
 export default {
     styles: `
-        .required:after {
-            content: ' *';
-            color: red;
+        .user-management {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            height: 100%;
         }
 
-        /* 表格容器样式 */
-        .table-responsive {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        /* 表格横向滚动容器 */
-        .table-container {
-            overflow-x: auto;
+        .card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
             background-color: #fff;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        /* 搜索表单样式 */
+        .search-form {
+            flex: none;
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        /* 表格容器样式 */
+        .table-responsive {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background-color: #fff;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        /* 表格横向滚动容器 */
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            min-width: 0;
+            min-height: 0;
+        }
+
         /* 表格样式优化 */
         .table {
             width: 100%;
             margin-bottom: 0;
-            white-space: nowrap;
             border-collapse: separate;
             border-spacing: 0;
             background-color: #fff;
