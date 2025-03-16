@@ -37,6 +37,7 @@ body {
     min-height: 0; /* 允许内容收缩 */
     overflow: hidden;
     padding: 1rem;
+    margin-top: 3em;
 }
 
 .content > * {
