@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import com.alibaba.excel.annotation.ExcelProperty;
+
 /**
  * 用户实体类
  */
@@ -18,15 +20,18 @@ public class User {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ExcelProperty("用户ID")
     private Long id;
     
     @Column(nullable = false, unique = true, length = 50)
+    @ExcelProperty("用户名")
     private String username;
     
     @Column(nullable = false)
     private String password;
     
     @Column(length = 100)
+    @ExcelProperty("电子邮箱")
     private String email;
     
     @Column(length = 20)

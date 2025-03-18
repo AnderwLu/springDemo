@@ -1,8 +1,15 @@
 package com.example.springdemo.web.controller;
 
+import com.example.springdemo.batch.config.ExportBatchConfig;
 import com.example.springdemo.dao.entity.User;
 import com.example.springdemo.dao.repository.UserRepository;
+
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -11,9 +18,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * 用户控制器
@@ -24,6 +35,15 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private JobLauncher jobLauncher;
+
+    @Autowired
+    @Qualifier("exportUserJob")
+    private Job exportUserJob;
+    
+    @Autowired
+    private ExportBatchConfig exportBatchConfig;
 
     /**
      * 获取用户列表（支持模糊搜索）
@@ -205,15 +225,62 @@ public class UserController {
      * 导出用户数据
      */
     @GetMapping("/export")
-    public ResponseEntity<byte[]> exportUsers() {
+    public ResponseEntity<byte[]> exportUsers(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        
+        Map<String, Object> response = new HashMap<>();
         try {
-            // TODO: 实现数据导出到Excel的逻辑
+            // 生成唯一的导出文件名
+            String exportId = UUID.randomUUID().toString();
+            String filePath = System.getProperty("java.io.tmpdir") + "/users_export_" + exportId + ".xlsx";
+            
+            // 构建作业参数，包含查询条件
+            JobParametersBuilder parametersBuilder = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .addString("outputPath", filePath);
+                    
+            // 添加查询条件（如果有）
+            if (username != null && !username.isEmpty()) {
+                parametersBuilder.addString("username", username);
+            }
+            if (email != null && !email.isEmpty()) {
+                parametersBuilder.addString("email", email);
+            }
+            if (startDate != null && !startDate.isEmpty()) {
+                parametersBuilder.addString("startDate", startDate);
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                parametersBuilder.addString("endDate", endDate);
+            }
+            
+            JobParameters jobParameters = parametersBuilder.toJobParameters();
+            
+            // 运行批处理作业
+            jobLauncher.run(exportUserJob, jobParameters);
+            
+            // 读取生成的Excel文件
+            byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
+            
+            // 构建文件名 - 添加一些查询参数信息
+            StringBuilder filenameSuffix = new StringBuilder();
+            if (username != null && !username.isEmpty()) {
+                filenameSuffix.append("_").append(username);
+            }
+            
+            String filename = "users" + (filenameSuffix.length() > 0 ? filenameSuffix.toString() : "") + ".xlsx";
+            
+            // 返回Excel文件
             return ResponseEntity
                     .ok()
-                    .header("Content-Type", "application/vnd.ms-excel")
-                    .header("Content-Disposition", "attachment; filename=users.xlsx")
-                    .body(new byte[0]); // 临时返回空数据
+                    .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    .header("Content-Disposition", "attachment; filename=" + filename)
+                    .body(fileContent);
+            
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
