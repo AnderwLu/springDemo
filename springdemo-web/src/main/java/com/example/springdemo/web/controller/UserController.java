@@ -1,206 +1,82 @@
 package com.example.springdemo.web.controller;
 
-import com.example.springdemo.batch.config.ExportBatchConfig;
-import com.example.springdemo.dao.entity.User;
-import com.example.springdemo.dao.repository.UserRepository;
+import com.example.springdemo.common.result.Result;
+import com.example.springdemo.dao.dto.user.UserDto;
+import com.example.springdemo.service.userService.UserService;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+
+import lombok.extern.slf4j.Slf4j;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 用户控制器
  */
 @RestController
 @RequestMapping("/api/users")
+@Slf4j
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private JobLauncher jobLauncher;
+    private UserService userService;
 
     @Autowired
     @Qualifier("exportUserJob")
     private Job exportUserJob;
-    
-    @Autowired
-    private ExportBatchConfig exportBatchConfig;
 
     /**
      * 获取用户列表（支持模糊搜索）
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getUsers(
-            @RequestParam(required = false) String username,
-            @RequestParam(required = false) String email,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 创建分页请求
-            PageRequest pageRequest = PageRequest.of(page, size);
-            Page<User> userPage;
-            
-            if (username != null || email != null) {
-                // 创建查询条件
-                User probe = new User();
-                probe.setUsername(username);
-                probe.setEmail(email);
-                
-                // 创建匹配器，设置模糊匹配
-                ExampleMatcher matcher = ExampleMatcher.matching()
-                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
-                        .withIgnoreCase()
-                        .withIgnoreNullValues();
-                
-                // 执行分页查询
-                userPage = userRepository.findAll(Example.of(probe, matcher), pageRequest);
-            } else {
-                userPage = userRepository.findAll(pageRequest);
-            }
-            
-            // 处理密码，不返回给前端
-            userPage.getContent().forEach(user -> user.setPassword("[PROTECTED]"));
-            
-            // 构建分页响应数据
-            Map<String, Object> pageData = new HashMap<>();
-            pageData.put("content", userPage.getContent());
-            pageData.put("totalElements", userPage.getTotalElements());
-            pageData.put("totalPages", userPage.getTotalPages());
-            pageData.put("number", userPage.getNumber());
-            pageData.put("size", userPage.getSize());
-            
-            response.put("code", 200);
-            response.put("message", "获取用户列表成功");
-            response.put("data", pageData);
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("code", 500);
-            response.put("message", "获取用户列表失败: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
-        }
+    public Result<List<UserDto>> getUsers(UserDto userDto,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) PageRequest pageRequest) {
+        return Result.success(userService.findAll(userDto, pageRequest));
     }
 
-    /**
+    /*
      * 新增用户
      */
+    @SuppressWarnings("rawtypes")
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 检查用户名是否已存在
-            if (userRepository.existsByUsername(user.getUsername())) {
-                response.put("code", 400);
-                response.put("message", "用户名已存在");
-                return ResponseEntity.badRequest().body(response);
-            }
-            
-            // 保存用户
-            User savedUser = userRepository.save(user);
-            savedUser.setPassword("[PROTECTED]");
-            
-            response.put("code", 200);
-            response.put("message", "创建用户成功");
-            response.put("data", savedUser);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("code", 500);
-            response.put("message", "创建用户失败: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
-        }
+    public Result createUser(@RequestBody UserDto userDto) {
+        userService.createUser(userDto);
+        return Result.success();
     }
 
     /**
      * 更新用户
      */
+    @SuppressWarnings("rawtypes")
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updateUser(
+    public Result updateUser(
             @PathVariable Long id,
-            @RequestBody User user) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 检查用户是否存在
-            Optional<User> existingUser = userRepository.findById(id);
-            if (!existingUser.isPresent()) {
-                response.put("code", 404);
-                response.put("message", "用户不存在");
-                return ResponseEntity.notFound().build();
-            }
-            
-            // 检查用户名是否与其他用户重复
-            User userWithSameUsername = userRepository.findByUsername(user.getUsername());
-            if (userWithSameUsername != null && !userWithSameUsername.getId().equals(id)) {
-                response.put("code", 400);
-                response.put("message", "用户名已存在");
-                return ResponseEntity.badRequest().body(response);
-            }
-            
-            // 更新用户信息
-            User userToUpdate = existingUser.get();
-            userToUpdate.setUsername(user.getUsername());
-            userToUpdate.setEmail(user.getEmail());
-            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-                userToUpdate.setPassword(user.getPassword());
-            }
-            
-            User updatedUser = userRepository.save(userToUpdate);
-            updatedUser.setPassword("[PROTECTED]");
-            
-            response.put("code", 200);
-            response.put("message", "更新用户成功");
-            response.put("data", updatedUser);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("code", 500);
-            response.put("message", "更新用户失败: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
-        }
+            @RequestBody UserDto userDto) {
+        userService.updateUser(id, userDto);
+        return Result.success();
     }
 
     /**
      * 删除用户
      */
+    @SuppressWarnings("rawtypes")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 检查用户是否存在
-            if (!userRepository.existsById(id)) {
-                response.put("code", 404);
-                response.put("message", "用户不存在");
-                return ResponseEntity.notFound().build();
-            }
-            
-            userRepository.deleteById(id);
-            
-            response.put("code", 200);
-            response.put("message", "删除用户成功");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("code", 500);
-            response.put("message", "删除用户失败: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
-        }
+    public Result deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return Result.success();
     }
 
     /**
@@ -222,66 +98,24 @@ public class UserController {
     }
 
     /**
-     * 导出用户数据
+     * 导出用户数据（使用Spring Batch的ItemStreamWriter进行流式导出）
+     * 
+     * @throws Exception
      */
+    @SuppressWarnings("rawtypes")
     @GetMapping("/export")
-    public ResponseEntity<byte[]> exportUsers(
-            @RequestParam(required = false) String username,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
-        
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 生成唯一的导出文件名
-            String exportId = UUID.randomUUID().toString();
-            String filePath = System.getProperty("java.io.tmpdir") + "/users_export_" + exportId + ".xlsx";
-            
-            // 构建作业参数，包含查询条件
-            JobParametersBuilder parametersBuilder = new JobParametersBuilder()
-                    .addLong("time", System.currentTimeMillis())
-                    .addString("outputPath", filePath);
-                    
-            // 添加查询条件（如果有）
-            if (username != null && !username.isEmpty()) {
-                parametersBuilder.addString("username", username);
-            }
-            if (email != null && !email.isEmpty()) {
-                parametersBuilder.addString("email", email);
-            }
-            if (startDate != null && !startDate.isEmpty()) {
-                parametersBuilder.addString("startDate", startDate);
-            }
-            if (endDate != null && !endDate.isEmpty()) {
-                parametersBuilder.addString("endDate", endDate);
-            }
-            
-            JobParameters jobParameters = parametersBuilder.toJobParameters();
-            
-            // 运行批处理作业
-            jobLauncher.run(exportUserJob, jobParameters);
-            
-            // 读取生成的Excel文件
-            byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
-            
-            // 构建文件名 - 添加一些查询参数信息
-            StringBuilder filenameSuffix = new StringBuilder();
-            if (username != null && !username.isEmpty()) {
-                filenameSuffix.append("_").append(username);
-            }
-            
-            String filename = "users" + (filenameSuffix.length() > 0 ? filenameSuffix.toString() : "") + ".xlsx";
-            
-            // 返回Excel文件
-            return ResponseEntity
-                    .ok()
-                    .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                    .header("Content-Disposition", "attachment; filename=" + filename)
-                    .body(fileContent);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
+    public Result exportUsers(UserDto userDto, HttpServletResponse response) throws Exception {
+
+        // 设置响应头
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        // 构建文件名
+        String filename = "用户表users" + ".xlsx";
+        // 防止中文乱码
+        String encodedFilename = URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename=" + encodedFilename);
+        userService.exportUsers(userDto, response);
+        return Result.success();
     }
-} 
+
+}

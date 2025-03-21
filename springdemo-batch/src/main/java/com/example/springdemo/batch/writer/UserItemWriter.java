@@ -23,10 +23,10 @@ public class UserItemWriter implements ItemWriter<User> {
 
     @Override
     public void write(List<? extends User> items) throws Exception {
-        List<com.example.springdemo.dao.entity.User> entities = new ArrayList<>();
+        List<com.example.springdemo.dao.entity.user.User> entities = new ArrayList<>();
         
         for (User item : items) {
-            com.example.springdemo.dao.entity.User entity = new com.example.springdemo.dao.entity.User();
+            com.example.springdemo.dao.entity.user.User entity = new com.example.springdemo.dao.entity.user.User();
             // 复制属性
             entity.setUsername(item.getUsername());
             entity.setPassword(item.getPassword());

@@ -3,7 +3,7 @@ package com.example.springdemo.batch.config;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
-import com.example.springdemo.dao.entity.User;
+import com.example.springdemo.dao.entity.user.User;
 import com.example.springdemo.dao.repository.UserRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

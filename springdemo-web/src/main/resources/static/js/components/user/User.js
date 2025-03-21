@@ -35,7 +35,8 @@ export default defineComponent({
                 role: 'ROLE_USER',
                 enabled: true
             },
-            showAddModal: false
+            showAddModal: false,
+            exporting: false
         };
     },
     methods: {
@@ -131,29 +132,98 @@ export default defineComponent({
                 this.error = '导入用户数据失败: ' + err.message;
             }
         },
-        async handleExport() {
+        async handleExport(event) {
+            if (this.exporting) {
+                return; // 防止重复点击
+            }
+            
+            this.exporting = true;
+            
             try {
-                const response = await fetch('/springdemo/api/users/export');
-                if (!response.ok) {
-                    throw new Error('导出用户数据失败');
+                // 创建飞入动画
+                this.createFlyAnimation(event);
+                
+                const params = new URLSearchParams();
+                if (this.queryParams.username) {
+                    params.append('username', this.queryParams.username);
                 }
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
+                if (this.queryParams.email) {
+                    params.append('email', this.queryParams.email);
+                }
+                
+                // 使用浏览器原生方式下载
+                const downloadUrl = `/springdemo/api/users/export?${params.toString()}`;
+                
+                // 使用<a>标签直接触发下载，不处理响应内容
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = 'users.xlsx';
+                a.href = downloadUrl;
+                // 不设置download属性，让浏览器使用服务器提供的文件名
+                // a.download = filename; 
+                
+                // 添加到DOM并触发点击
                 document.body.appendChild(a);
                 a.click();
-                window.URL.revokeObjectURL(url);
+                
+                // 清理DOM
                 document.body.removeChild(a);
+                
             } catch (err) {
                 console.error('导出用户数据失败:', err);
                 this.error = '导出用户数据失败: ' + err.message;
+            } finally {
+                // 延迟重置状态，防止短时间内多次点击
+                setTimeout(() => {
+                    this.exporting = false;
+                }, 1000);
             }
+        },
+        /**
+         * 创建按钮点击动画效果
+         * 
+         * 当用户点击导出按钮时，创建一个从按钮中心向外扩散的动画效果
+         * 提供视觉反馈，增强用户体验
+         * 
+         * @param {Event} event - 点击事件对象，用于获取按钮位置
+         */
+        createFlyAnimation(event) {
+            // 只是在按钮周围创建一个扩散效果，而不是飞向特定位置
+            const button = event.target.closest('button');
+            const rect = button.getBoundingClientRect();
+            const ripple = document.createElement('div');
+            
+            // 设置涟漪元素的样式
+            // 将元素定位在按钮中心位置
+            ripple.style.cssText = `
+                position: fixed; /* 使用fixed定位，相对于视口固定位置，确保动画效果不受页面滚动影响 */
+                left: ${rect.left + rect.width/2}px;
+                top: ${rect.top + rect.height/2}px;
+                width: 20px;
+                height: 20px;
+                background-color: rgba(54, 153, 255, 0.5);
+                border-radius: 50%;
+                transform: translate(-50%, -50%) scale(1);
+                z-index: 9999;
+                pointer-events: none;
+            `;
+            
+            // 将涟漪元素添加到DOM中
+            document.body.appendChild(ripple);
+            
+            // 延迟一小段时间后开始动画
+            // 这样可以确保元素已经被渲染，动画效果更流畅
+            setTimeout(() => {
+                ripple.style.transition = 'all 0.5s ease-out';
+                ripple.style.transform = 'translate(-50%, -50%) scale(3)';
+                ripple.style.opacity = '0';
+            }, 50);
+            
+            // 动画结束后移除涟漪元素，避免DOM污染
+            setTimeout(() => {
+                document.body.removeChild(ripple);
+            }, 600);
         },
         async handleEdit(user) {
             try {
-                // 克隆用户对象，避免直接修改列表中的数据
                 this.editingUser = { ...user };
                 this.showEditModal = true;
             } catch (err) {
@@ -177,7 +247,6 @@ export default defineComponent({
 
                 const result = await response.json();
                 if (result.code === 200) {
-                    // 删除成功后刷新列表
                     this.fetchUsers();
                 } else {
                     throw new Error(result.message || '删除用户失败');
@@ -234,7 +303,7 @@ export default defineComponent({
                 }
                 const result = await response.json();
                 if (result.code === 200) {
-                    this.fetchUsers(); // 刷新用户列表
+                    this.fetchUsers();
                 } else {
                     throw new Error(result.message || '更新用户状态失败');
                 }
@@ -294,8 +363,8 @@ export default defineComponent({
                 const result = await response.json();
                 if (result.code === 200) {
                     this.showAddModal = false;
-                    this.handleCancelAdd(); // 清空表单
-                    this.fetchUsers(); // 刷新列表
+                    this.handleCancelAdd();
+                    this.fetchUsers();
                 } else {
                     throw new Error(result.message || '创建用户失败');
                 }
@@ -310,7 +379,6 @@ export default defineComponent({
                 return false;
             }
             if (!user.password && !user.id) {
-                // 新增时密码必填
                 this.error = '密码不能为空';
                 return false;
             }
@@ -322,13 +390,11 @@ export default defineComponent({
                 this.error = '真实姓名不能为空';
                 return false;
             }
-            // 清除错误提示
             this.error = null;
             return true;
         }
     },
     mounted() {
-        // 添加样式到页面
         if (!document.getElementById('user-management-styles')) {
             const styleElement = document.createElement('style');
             styleElement.id = 'user-management-styles';

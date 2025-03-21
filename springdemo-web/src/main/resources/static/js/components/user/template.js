@@ -43,7 +43,7 @@ export default `
                                 <i class="fas fa-file-import me-1"></i>
                                 导入
                             </button>
-                            <button class="btn btn-outline-primary" style="min-width: 100px; height: 40px; background-color: #e1f0ff; color: #3699ff; border-color: #e1f0ff" @click="handleExport" title="导出Excel文件">
+                            <button class="btn btn-outline-primary" style="min-width: 100px; height: 40px; background-color: #e1f0ff; color: #3699ff; border-color: #e1f0ff" @click="handleExport" title="导出Excel文件" :disabled="exporting">
                                 <i class="fas fa-file-export me-1"></i>
                                 导出
                             </button>
