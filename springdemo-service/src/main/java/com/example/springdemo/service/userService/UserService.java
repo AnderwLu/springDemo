@@ -4,14 +4,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.springdemo.dao.dto.user.UserDto;
 
 public interface UserService {
   List<UserDto> findAll();
 
-  List<UserDto> findAll(UserDto userDto, PageRequest pageRequest);
+  List<UserDto> findAll(UserDto userDto, Pageable pageable);
 
   UserDto createUser(UserDto user);
 

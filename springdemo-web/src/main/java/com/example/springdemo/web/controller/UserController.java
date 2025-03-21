@@ -7,14 +7,16 @@ import com.example.springdemo.service.userService.UserService;
 import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.rmi.server.ExportException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +45,8 @@ public class UserController {
      */
     @GetMapping
     public Result<List<UserDto>> getUsers(UserDto userDto,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) PageRequest pageRequest) {
-        return Result.success(userService.findAll(userDto, pageRequest));
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return Result.success(userService.findAll(userDto, pageable));
     }
 
     /*
@@ -102,20 +104,23 @@ public class UserController {
      * 
      * @throws Exception
      */
-    @SuppressWarnings("rawtypes")
     @GetMapping("/export")
-    public Result exportUsers(UserDto userDto, HttpServletResponse response) throws Exception {
+    public void exportUsers(UserDto userDto, HttpServletResponse response) throws ExportException {
 
         // 设置响应头
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setCharacterEncoding("utf-8");
-        // 构建文件名
-        String filename = "用户表users" + ".xlsx";
-        // 防止中文乱码
-        String encodedFilename = URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
-        response.setHeader("Content-disposition", "attachment;filename=" + encodedFilename);
-        userService.exportUsers(userDto, response);
-        return Result.success();
+        try {
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            // 构建文件名
+            String filename = "用户表users" + ".xlsx";
+            // 防止中文乱码
+            String encodedFilename = URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename=" + encodedFilename);
+            userService.exportUsers(userDto, response);
+        } catch (Exception e) {
+            log.error("导出用户数据失败: {}", e.getMessage(),e);
+            throw new ExportException("导出用户数据失败: " + e.getMessage());
+        }
     }
 
 }

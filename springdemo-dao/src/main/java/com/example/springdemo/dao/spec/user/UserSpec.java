@@ -21,7 +21,9 @@ public class UserSpec implements Specification<User> {
   @Override
   public Predicate toPredicate(@SuppressWarnings("null") Root<User> root,
       @SuppressWarnings("null") CriteriaQuery<?> query, @SuppressWarnings("null") CriteriaBuilder criteriaBuilder) {
-    return criteriaBuilder.like(root.get("username"), "%" + userDto.getUsername() + "%");
+    if (userDto.getUsername() != null) {
+      return criteriaBuilder.like(root.get("username"), "%" + userDto.getUsername() + "%");
+    }
+    return criteriaBuilder.conjunction();
   }
-
 }

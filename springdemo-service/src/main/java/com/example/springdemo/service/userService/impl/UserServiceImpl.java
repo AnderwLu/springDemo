@@ -29,6 +29,7 @@ import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +61,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List<UserDto> findAll(UserDto userDto, PageRequest pageRequest) {
-    Page<User> users = userRepository.findAll(new UserSpec(userDto), pageRequest);
+  public List<UserDto> findAll(UserDto userDto, Pageable pageable) {
+    Page<User> users = userRepository.findAll(new UserSpec(userDto), pageable);
     if (users.isEmpty()) {
       throw new RuntimeException("没有用户");
     }
