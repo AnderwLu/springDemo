@@ -22,12 +22,12 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
     }
 
     @Override
-    public void beforeJob(JobExecution jobExecution) {
+    public void beforeJob(@SuppressWarnings("null") JobExecution jobExecution) {
         log.info("开始执行导入作业: {}", jobExecution.getJobInstance().getJobName());
     }
 
     @Override
-    public void afterJob(JobExecution jobExecution) {
+    public void afterJob(@SuppressWarnings("null") JobExecution jobExecution) {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
             log.info("导入作业完成!");
             

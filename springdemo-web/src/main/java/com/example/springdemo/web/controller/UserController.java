@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.rmi.server.ExportException;
 import java.util.HashMap;
@@ -35,10 +34,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    @Qualifier("exportUserJob")
-    private Job exportUserJob;
 
     /**
      * 获取用户列表（支持模糊搜索）

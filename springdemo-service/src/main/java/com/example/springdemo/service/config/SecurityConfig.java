@@ -61,31 +61,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 关闭CSRF
-            .csrf().disable()
-            // 基于表单的登录
-            .formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .successHandler(authenticationSuccessHandler())
-                .permitAll()
-                .and()
-            // 退出登录
-            .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-                .and()
-            // 授权请求
-            .authorizeRequests()
-                // 静态资源
-                .antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/login.html").permitAll()
-                // 健康检查
-                .antMatchers("/health").permitAll()
-                // API请求
-                .antMatchers("/api/**").authenticated()
-                // 其他请求需要认证
-                .anyRequest().authenticated();
+                // 关闭CSRF
+                .csrf(csrf -> csrf.disable())
+                // 基于表单的登录
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .successHandler(authenticationSuccessHandler())
+                        .permitAll())
+                // 退出登录
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll())
+                // 授权请求
+                .authorizeRequests(requests -> requests
+                        // 静态资源
+                        .antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/login.html").permitAll()
+                        // 健康检查
+                        .antMatchers("/health").permitAll()
+                        // API请求
+                        .antMatchers("/api/**").authenticated()
+                        // 其他请求需要认证
+                        .anyRequest().authenticated());
         
         return http.build();
     }

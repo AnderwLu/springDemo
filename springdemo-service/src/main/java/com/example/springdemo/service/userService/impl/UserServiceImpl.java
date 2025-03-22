@@ -1,7 +1,9 @@
 package com.example.springdemo.service.userService.impl;
 
-import com.example.springdemo.batch.processor.ReaderUtils;
-import com.example.springdemo.batch.writer.EasyExcelItemStreamWriter;
+import com.example.springdemo.batch.config.BatchConfig;
+import com.example.springdemo.batch.processor.Processors;
+import com.example.springdemo.batch.reader.ItemReaders;
+import com.example.springdemo.batch.writer.ItemWriters;
 import com.example.springdemo.dao.dto.user.UserDto;
 import com.example.springdemo.dao.entity.user.User;
 import com.example.springdemo.dao.repository.UserRepository;
@@ -20,15 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -41,15 +39,19 @@ public class UserServiceImpl implements UserService {
   private UserRepository userRepository;
 
   @Autowired
-  private ReaderUtils readerUtils;
+  private ItemReaders readerUtils;
 
   @Autowired
-  private StepBuilderFactory stepBuilderFactory;
-
+  private ItemWriters writerUtils;
+  
   @Autowired
-  private JobBuilderFactory jobBuilderFactory;
+  private BatchConfig batchConfig;
+
   @Autowired
   private JobLauncher jobLauncher;
+
+  @Autowired
+  private Processors processors;
 
   @Override
   public List<UserDto> findAll() {
@@ -109,25 +111,8 @@ public class UserServiceImpl implements UserService {
     JpaPagingItemReader<User> reader = readerUtils.createUserExportReader(queryBuilder.toString(), parameterValues,
         "userExportReader");
     // 创建读取器和写入器
-    EasyExcelItemStreamWriter<User> writer = new EasyExcelItemStreamWriter<>(response, User.class, "用户数据");
-
-    // 创建一个简单的敏感数据处理器
-    ItemProcessor<User, User> processor = user -> {
-      user.setPassword("[PROTECTED]");
-      return user;
-    };
-    // 创建批处理步骤
-    Step exportStep = stepBuilderFactory.get("exportUsersStep")
-        .<User, User>chunk(100)
-        .reader(reader)
-        .processor(processor)
-        .writer(writer)
-        .build();
-
-    // 创建并执行作业
-    Job exportJob = jobBuilderFactory.get("exportUsersJob-" + System.currentTimeMillis())
-        .start(exportStep)
-        .build();
+    ItemStreamWriter<User> writer = writerUtils.createEasyExcelItemStreamWriter(response, User.class, "用户数据");
+    Job exportJob = batchConfig.jpaImportFileJob(reader, processors.getDefaultProcessor(), writer);
 
     // 使用JobLauncher执行作业
     JobParameters jobParameters = new JobParametersBuilder()
