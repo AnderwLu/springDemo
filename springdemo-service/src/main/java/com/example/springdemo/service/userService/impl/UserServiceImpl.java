@@ -4,6 +4,7 @@ import com.example.springdemo.batch.config.BatchConfig;
 import com.example.springdemo.batch.processor.Processors;
 import com.example.springdemo.batch.reader.ItemReaders;
 import com.example.springdemo.batch.writer.ItemWriters;
+import com.example.springdemo.common.result.TableResultResponse;
 import com.example.springdemo.dao.dto.user.UserDto;
 import com.example.springdemo.dao.entity.user.User;
 import com.example.springdemo.dao.repository.UserRepository;
@@ -15,6 +16,7 @@ import cn.hutool.core.bean.BeanUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,18 +55,14 @@ public class UserServiceImpl implements UserService {
   @Autowired
   private Processors processors;
 
-  @Override
-  public List<UserDto> findAll() {
-    List<User> users = userRepository.findAll();
-    if (users.isEmpty()) {
-      throw new RuntimeException("没有用户");
-    }
-    return BeanUtil.copyToList(users, UserDto.class);
+  private Page<User> all(UserDto userDto, Pageable pageable) {
+    Page<User> users = userRepository.findAll(new UserSpec(userDto), pageable);
+    return users;
   }
 
   @Override
   public List<UserDto> findAll(UserDto userDto, Pageable pageable) {
-    Page<User> users = userRepository.findAll(new UserSpec(userDto), pageable);
+    Page<User> users = all(userDto, pageable);
     if (users.isEmpty()) {
       throw new RuntimeException("没有用户");
     }
@@ -121,6 +119,25 @@ public class UserServiceImpl implements UserService {
 
     jobLauncher.run(exportJob, jobParameters);
 
+  }
+
+  @Override
+  public TableResultResponse<UserDto> findPageable(UserDto userDto, Pageable pageable) {
+      // 获取 User 实体的分页结果
+      // Page<User> userPage = all(userDto, pageable);
+      long count = userRepository.count();
+      log.info("count: {}", count);
+      Page<User> userPage = userRepository.findAll(pageable);
+      // 如果没有数据，可以返回空页而不是抛出异常
+      // 抛出异常会导致前端请求失败，空页则可以显示"暂无数据"
+      
+      // 将 User 列表转换为 UserDto 列表
+      List<UserDto> userDtos = userPage.getContent().stream()
+              .map(user -> BeanUtil.copyProperties(user, UserDto.class))
+              .collect(Collectors.toList());
+
+    // 创建一个新的 PageImpl 对象，保留原始分页信息
+    return new TableResultResponse<UserDto>(userDtos, userPage.getTotalElements());
   }
 
 }

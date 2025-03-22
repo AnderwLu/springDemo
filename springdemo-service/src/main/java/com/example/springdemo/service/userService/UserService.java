@@ -4,12 +4,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.example.springdemo.common.result.TableResultResponse;
 import com.example.springdemo.dao.dto.user.UserDto;
 
 public interface UserService {
-  List<UserDto> findAll();
 
   List<UserDto> findAll(UserDto userDto, Pageable pageable);
 
@@ -20,4 +21,6 @@ public interface UserService {
   void deleteUser(Long id);
 
   void exportUsers(UserDto userDto, HttpServletResponse response) throws Exception;
+
+  TableResultResponse<UserDto> findPageable(UserDto userDto, Pageable pageable);
 }

@@ -121,24 +121,101 @@ export default `
 
             <!-- 分页组件 -->
             <div v-if="!loading && !error && users.length > 0" class="d-flex justify-content-between align-items-center mt-4">
-                <div class="text-secondary">共 {{ pagination.totalElements }} 条记录，每页 {{ pagination.size }} 条</div>
-                <nav aria-label="Page navigation">
-                    <ul class="pagination mb-0">
-                        <li class="page-item" :class="{ disabled: pagination.page === 0 }">
-                            <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.page - 1)" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li v-for="page in pagination.totalPages" :key="page" class="page-item" :class="{ active: pagination.page === page - 1 }">
-                            <a class="page-link" href="#" @click.prevent="handlePageChange(page - 1)">{{ page }}</a>
-                        </li>
-                        <li class="page-item" :class="{ disabled: pagination.page >= pagination.totalPages - 1 }">
-                            <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.page + 1)" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                <div class="text-secondary">共 {{ pagination.totalElements }} 条记录</div>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <select class="form-select form-select-sm" v-model="pagination.size" @change="handleSizeChange($event.target.value)">
+                            <option value="5">5条/页</option>
+                            <option value="10">10条/页</option>
+                            <option value="20">20条/页</option>
+                            <option value="50">50条/页</option>
+                        </select>
+                    </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination mb-0">
+                            <li class="page-item" :class="{ disabled: pagination.page === 0 }">
+                                <a class="page-link" href="#" @click.prevent="handlePageChange(0)" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" :class="{ disabled: pagination.page === 0 }">
+                                <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.page - 1)" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <template v-if="pagination.totalPages <= 7">
+                                <!-- 总页数较少时，显示所有页码 -->
+                                <li v-for="page in pagination.totalPages" :key="page" class="page-item" :class="{ active: pagination.page === page - 1 }">
+                                    <a class="page-link" href="#" @click.prevent="handlePageChange(page - 1)">{{ page }}</a>
+                                </li>
+                            </template>
+                            <template v-else>
+                                <!-- 总页数较多时，智能显示页码 -->
+                                <!-- 当前页前后最多显示2个页码，其余用省略号表示 -->
+                                <template v-if="pagination.page < 3">
+                                    <!-- 当前页靠近开始位置 -->
+                                    <li v-for="page in 5" :key="page" class="page-item" :class="{ active: pagination.page === page - 1 }">
+                                        <a class="page-link" href="#" @click.prevent="handlePageChange(page - 1)">{{ page }}</a>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#">...</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.totalPages - 1)">{{ pagination.totalPages }}</a>
+                                    </li>
+                                </template>
+                                <template v-else-if="pagination.page >= pagination.totalPages - 3">
+                                    <!-- 当前页靠近结束位置 -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" @click.prevent="handlePageChange(0)">1</a>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#">...</a>
+                                    </li>
+                                    <li v-for="page in 5" :key="pagination.totalPages - 5 + page" class="page-item" 
+                                        :class="{ active: pagination.page === pagination.totalPages - 6 + page }">
+                                        <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.totalPages - 6 + page)">
+                                            {{ pagination.totalPages - 4 + page }}
+                                        </a>
+                                    </li>
+                                </template>
+                                <template v-else>
+                                    <!-- 当前页在中间位置 -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" @click.prevent="handlePageChange(0)">1</a>
+                                    </li>
+                                    <li class="page-item disabled" v-if="pagination.page > 3">
+                                        <a class="page-link" href="#">...</a>
+                                    </li>
+                                    <li v-for="offset in 5" :key="pagination.page + offset - 2" class="page-item" 
+                                        :class="{ active: offset === 3 }">
+                                        <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.page + offset - 3)">
+                                            {{ pagination.page + offset - 2 }}
+                                        </a>
+                                    </li>
+                                    <li class="page-item disabled" v-if="pagination.page < pagination.totalPages - 4">
+                                        <a class="page-link" href="#">...</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.totalPages - 1)">
+                                            {{ pagination.totalPages }}
+                                        </a>
+                                    </li>
+                                </template>
+                            </template>
+                            <li class="page-item" :class="{ disabled: pagination.page >= pagination.totalPages - 1 }">
+                                <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.page + 1)" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" :class="{ disabled: pagination.page >= pagination.totalPages - 1 }">
+                                <a class="page-link" href="#" @click.prevent="handlePageChange(pagination.totalPages - 1)" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
 
             <!-- 新增用户模态框 -->

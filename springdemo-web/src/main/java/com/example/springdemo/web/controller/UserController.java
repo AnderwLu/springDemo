@@ -1,24 +1,20 @@
 package com.example.springdemo.web.controller;
 
 import com.example.springdemo.common.result.Result;
+import com.example.springdemo.common.result.TableResultResponse;
 import com.example.springdemo.dao.dto.user.UserDto;
 import com.example.springdemo.service.userService.UserService;
 
-import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLEncoder;
 import java.rmi.server.ExportException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,9 +35,9 @@ public class UserController {
      * 获取用户列表（支持模糊搜索）
      */
     @GetMapping
-    public Result<List<UserDto>> getUsers(UserDto userDto,
-            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return Result.success(userService.findAll(userDto, pageable));
+    public Result<TableResultResponse<UserDto>> getUsers(UserDto userDto,
+            @PageableDefault(page = 1, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return Result.success(userService.findPageable(userDto, pageable));
     }
 
     /*
@@ -79,19 +75,11 @@ public class UserController {
     /**
      * 导入用户数据
      */
+    @SuppressWarnings("rawtypes")
     @PostMapping("/import")
-    public ResponseEntity<Map<String, Object>> importUsers(@RequestParam("file") MultipartFile file) {
-        Map<String, Object> response = new HashMap<>();
-        try {
+    public Result importUsers(@RequestParam("file") MultipartFile file) {
             // TODO: 实现Excel文件解析和数据导入逻辑
-            response.put("code", 200);
-            response.put("message", "导入用户成功");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("code", 500);
-            response.put("message", "导入用户失败: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
-        }
+        return Result.success();
     }
 
     /**
