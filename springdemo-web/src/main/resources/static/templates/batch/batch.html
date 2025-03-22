@@ -1,4 +1,3 @@
-export default `
 <div class="user-management">
     <div class="card shadow-sm">
         <div class="card-header">
@@ -9,29 +8,22 @@ export default `
             <div class="mb-4">
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary" @click="handleImport">
-                        <i class="fas fa-upload me-1"></i> 导入Excel
+                        <i class="fas fa-upload me-1"></i>
+                        导入Excel
                     </button>
                     <button class="btn btn-success" @click="handleExport">
-                        <i class="fas fa-download me-1"></i> 导出Excel
+                        <i class="fas fa-download me-1"></i>
+                        导出Excel
                     </button>
                 </div>
             </div>
 
             <!-- 错误提示 -->
-            <div v-if="error" class="alert alert-danger" role="alert">
-                {{ error }}
-            </div>
+            <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
 
             <!-- 导入进度条 -->
             <div v-if="importing" class="progress mb-3">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                     role="progressbar" 
-                     :style="{ width: importProgress + '%' }"
-                     :aria-valuenow="importProgress" 
-                     aria-valuemin="0" 
-                     aria-valuemax="100">
-                    {{importProgress}}%
-                </div>
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" :style="{ width: importProgress + '%' }" :aria-valuenow="importProgress" aria-valuemin="0" aria-valuemax="100">{{importProgress}}%</div>
             </div>
 
             <!-- 最近导入记录 -->
@@ -52,7 +44,8 @@ export default `
                                 <td>{{record.fileName}}</td>
                                 <td>{{record.importTime}}</td>
                                 <td>
-                                    <span :class="{'text-success': record.status === '成功', 
+                                    <span
+                                        :class="{'text-success': record.status === '成功', 
                                                  'text-danger': record.status === '失败'}">
                                         {{record.status}}
                                     </span>
@@ -66,4 +59,3 @@ export default `
         </div>
     </div>
 </div>
-`;

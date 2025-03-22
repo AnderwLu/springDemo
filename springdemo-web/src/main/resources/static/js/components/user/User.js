@@ -1,11 +1,8 @@
-import template from './template.js';
-import styles from './styles.js';
-
 const { defineComponent } = Vue;
 
 export default defineComponent({
     name: 'UserManagement',
-    template,
+    template: '#user-template',
     data() {
         return {
             users: [],
@@ -363,12 +360,21 @@ export default defineComponent({
         }
     },
     mounted() {
-        if (!document.getElementById('user-management-styles')) {
-            const styleElement = document.createElement('style');
-            styleElement.id = 'user-management-styles';
-            styleElement.textContent = styles.styles;
-            document.head.appendChild(styleElement);
+        // 动态加载组件样式
+        if (!document.getElementById('user-component-styles')) {
+            const link = document.createElement('link');
+            link.id = 'user-component-styles';
+            link.rel = 'stylesheet';
+            link.href = '/springdemo/css/components/user.css';
+            document.head.appendChild(link);
         }
         this.fetchUsers();
+    },
+    unmounted() {
+        // 组件卸载时移除样式
+        const styleSheet = document.getElementById('user-component-styles');
+        if (styleSheet) {
+            styleSheet.remove();
+        }
     }
 });

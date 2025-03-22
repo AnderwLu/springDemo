@@ -1,10 +1,7 @@
-import template from './template.js';
-import styles from './styles.js';
-
 const { defineComponent } = Vue;
 
 export default defineComponent({
-    name: 'BatchProcessing',
+    name: 'BatchManagement',
     template: '#batch-template',
     data() {
         return {
@@ -104,6 +101,24 @@ export default defineComponent({
                 console.error('导出失败:', err);
                 this.error = '导出失败: ' + err.message;
             }
+        }
+    },
+    mounted() {
+        // 动态加载组件样式
+        if (!document.getElementById('batch-component-styles')) {
+            const link = document.createElement('link');
+            link.id = 'batch-component-styles';
+            link.rel = 'stylesheet';
+            link.href = '/springdemo/css/components/batch.css';
+            document.head.appendChild(link);
+        }
+        this.fetchBatchJobs();
+    },
+    unmounted() {
+        // 组件卸载时移除样式
+        const styleSheet = document.getElementById('batch-component-styles');
+        if (styleSheet) {
+            styleSheet.remove();
         }
     }
 });

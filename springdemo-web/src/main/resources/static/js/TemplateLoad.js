@@ -25,26 +25,13 @@ class TemplateLoader {
     async loadTemplates() {
         try {
             const templateConfigs = [
-                { path: '/springdemo/templates/dashboard.html', id: 'dashboard-template' },
-                { path: '/springdemo/templates/home.html', id: 'home-template' },
-                { path: '/springdemo/templates/settings.html', id: 'settings-template' }
+                { path: '/springdemo/templates/dashboard/dashboard.html', id: 'dashboard-template' },
+                { path: '/springdemo/templates/home/home.html', id: 'home-template' },
+                { path: '/springdemo/templates/settings/settings.html', id: 'settings-template' },
+                { path: '/springdemo/templates/batch/batch.html', id: 'batch-template' },
+                { path: '/springdemo/templates/user/user.html', id: 'user-template' }
             ];
 
-            // 创建批处理模板
-            const batchTemplate = document.createElement('script');
-            batchTemplate.id = 'batch-template';
-            batchTemplate.type = 'text/x-template';
-            batchTemplate.innerHTML = (await import('./components/batch/template.js')).default;
-            this.templates.set('batch-template', batchTemplate);
-
-            // 创建用户管理模板
-            const userTemplate = document.createElement('script');
-            userTemplate.id = 'user-template';
-            userTemplate.type = 'text/x-template';
-            userTemplate.innerHTML = (await import('./components/user/template.js')).default;
-            this.templates.set('user-template', userTemplate);
-
-            // 加载其他模板
             await Promise.all(templateConfigs.map(config => this.loadTemplate(config.path, config.id)));
 
             this.appendTemplatesToDOM();
