@@ -47,4 +47,7 @@ mvnw.cmd
 *.swp
 *.swo
 .DS_Store
-cookies.txt 
+cookies.txt
+
+# 敏感配置文件
+springdemo-web/src/main/resources/application-ai.yml 
