@@ -1,0 +1,10 @@
+# AI 服务配置
+ai:
+  # API Key 配置
+  # 请将实际的 API Key 配置在 application-ai.yml 中
+  api-key: ${AI_API_KEY:your-api-key-here}
+  
+  # 其他 AI 相关配置
+  service:
+    url: https://api.example.com
+    timeout: 5000 
