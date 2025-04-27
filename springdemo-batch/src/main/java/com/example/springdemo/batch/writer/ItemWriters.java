@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.persistence.EntityManagerFactory;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
@@ -84,6 +85,17 @@ public class ItemWriters {
      */
     public <T> ItemStreamWriter<T> createEasyExcelItemStreamWriter(HttpServletResponse response, Class<T> entityClass, String sheetName) {
         return new ItemStreamWriter<T>() {
+            @Override
+            public void write(Chunk<? extends T> chunk) throws Exception {
+                if (!isInitialized) {
+                    throw new IllegalStateException("Excel写入器未初始化，请先调用open方法");
+                }
+
+                if (chunk != null && !chunk.isEmpty()) {
+                    excelWriter.write(chunk.getItems(), writeSheet);
+                }
+            }
+
             private ExcelWriter excelWriter;
             private WriteSheet writeSheet;
             private boolean isInitialized = false;
@@ -101,16 +113,6 @@ public class ItemWriters {
                     isInitialized = true;
                 } catch (IOException e) {
                     throw new ItemStreamException("无法创建Excel写入器", e);
-                }
-            }
-            @Override
-            public void write(@SuppressWarnings("null") List<? extends T> items) throws Exception {
-                if (!isInitialized) {
-                    throw new IllegalStateException("Excel写入器未初始化，请先调用open方法");
-                }
-        
-                if (items != null && !items.isEmpty()) {
-                    excelWriter.write(items, writeSheet);
                 }
             }
         
@@ -138,6 +140,17 @@ public class ItemWriters {
      */
     public <T> ItemStreamWriter<T> createEasyExcelItemStreamWriter(String filePath, Class<T> entityClass, String sheetName) {
         return new ItemStreamWriter<T>() {
+            @Override
+            public void write(Chunk<? extends T> chunk) throws Exception {
+                if (!isInitialized) {
+                    throw new IllegalStateException("Excel写入器未初始化，请先调用open方法");
+                }
+
+                if (chunk != null && !chunk.isEmpty()) {
+                    excelWriter.write(chunk.getItems(), writeSheet);
+                }
+            }
+
             private ExcelWriter excelWriter;
             private WriteSheet writeSheet;
             private boolean isInitialized = false;
@@ -156,16 +169,7 @@ public class ItemWriters {
                     throw new ItemStreamException("无法创建Excel写入器", e);
                 }
             }
-            @Override
-            public void write(@SuppressWarnings("null") List<? extends T> items) throws Exception {
-                if (!isInitialized) {
-                    throw new IllegalStateException("Excel写入器未初始化，请先调用open方法");
-                }
-        
-                if (items != null && !items.isEmpty()) {
-                    excelWriter.write(items, writeSheet);
-                }
-            }
+
         
             @Override
             public void update(@SuppressWarnings("null") ExecutionContext executionContext) throws ItemStreamException {

@@ -1,18 +1,20 @@
 package com.example.springdemo.dao.spec.menu;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.example.springdemo.dao.dto.menu.MenuDto;
 import com.example.springdemo.dao.entity.menu.Menu;
+import jakarta.persistence.criteria.Predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class MenuSpec implements Specification<Menu> {
 
@@ -24,7 +26,7 @@ public class MenuSpec implements Specification<Menu> {
 
   @Override
   public Predicate toPredicate(@SuppressWarnings("null") Root<Menu> root,
-      @SuppressWarnings("null") CriteriaQuery<?> query, @SuppressWarnings("null") CriteriaBuilder criteriaBuilder) {
+                               @SuppressWarnings("null") CriteriaQuery<?> query, @SuppressWarnings("null") CriteriaBuilder criteriaBuilder) {
     
     List<Predicate> predicates = new ArrayList<>();
     
@@ -34,7 +36,7 @@ public class MenuSpec implements Specification<Menu> {
     
     // 名称模糊查询
     if (StringUtils.hasText(menuDto.getName())) {
-      predicates.add(criteriaBuilder.like(root.get("name"), "%" + menuDto.getName() + "%"));
+      predicates.add(criteriaBuilder.like(root.<String>get("name"), "%" + menuDto.getName() + "%"));
     }
     
     // 按类型查询

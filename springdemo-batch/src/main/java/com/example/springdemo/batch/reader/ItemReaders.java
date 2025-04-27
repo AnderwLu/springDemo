@@ -2,8 +2,8 @@ package com.example.springdemo.batch.reader;
 
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
 
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;

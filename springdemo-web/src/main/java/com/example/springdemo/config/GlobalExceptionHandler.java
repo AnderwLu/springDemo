@@ -1,14 +1,14 @@
-package com.example.springdemo.web.config;
+package com.example.springdemo.config;
 
 import com.example.springdemo.common.result.Result;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import javax.servlet.http.HttpServletResponse;
 import java.rmi.server.ExportException;
 
 import lombok.extern.slf4j.Slf4j;

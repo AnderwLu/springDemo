@@ -1,4 +1,4 @@
-package com.example.springdemo.web;
+package com.example.springdemo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,15 +10,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * Spring Boot应用程序入口类
  */
 @SpringBootApplication(scanBasePackages = {
-    "com.example.springdemo.web",
-    "com.example.springdemo.service",
-    "com.example.springdemo.dao",
-    "com.example.springdemo.common",
-    "com.example.springdemo.batch"
+        "com.example"
 })
-@ComponentScan(basePackages = "com.example.springdemo")
+@ComponentScan(basePackages = "com.example")
 @EntityScan(basePackages = "com.example.springdemo.dao.entity")
-@EnableJpaRepositories(basePackages = "com.example.springdemo.dao.repository")
+//@EnableJpaRepositories(basePackages = "com.example.springdemo.dao.repository")
 public class SpringDemoApplication {
 
     public static void main(String[] args) {

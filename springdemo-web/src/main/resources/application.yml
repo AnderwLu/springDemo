@@ -1,102 +1,102 @@
 server:
-  port: 8080
-  servlet:
-    context-path: /springdemo
+    port: 8080
+    servlet:
+        context-path: /springdemo
 
 spring:
-  # 数据库配置
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://172.16.3.131:3306/springdemo?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
-    username: root
-    password: root123
-    schema: classpath:schema.sql
-    initialization-mode: always
-    data: classpath:data.sql
-    sql-script-encoding: UTF-8
-  
-  # JPA配置
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-  
-  # Spring Batch 配置
-  batch:
-    jdbc:
-      initialize-schema: always
-    job:
-      enabled: false
-  
-  # 允许 Bean 定义覆盖
-  main:
-    allow-bean-definition-overriding: true
-  
-  # Redis配置
-  redis:
-    host: localhost
-    port: 6379
-    database: 0
-    timeout: 10000
-  
-  # 邮件配置
-  mail:
-    host: smtp.example.com
-    port: 465
-    username: your-email@example.com
-    password: your-password
-    properties:
-      mail:
-        smtp:
-          auth: true
-          ssl:
-            enable: true
-  
-  # 静态资源配置
-  web:
-    resources:
-      static-locations: classpath:/static/
-      cache:
-        period: 0
-  
-  # 文件上传配置
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 100MB
-  
-  # DevTools 配置
-  devtools:
-    restart:
-      enabled: true
-      additional-paths: src/main/resources/static
-    livereload:
-      enabled: true
+    # 数据库配置
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.5.5:3307/springdemo?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+        username: root
+        password: root123
+
+    # JPA配置
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL8Dialect
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+
+    # Spring Batch 配置
+    batch:
+        jdbc:
+            initialize-schema: always
+        job:
+            enabled: false
+
+    # 允许 Bean 定义覆盖
+    main:
+        allow-bean-definition-overriding: true
+
+    # Redis配置
+    data:
+        redis:
+            host: localhost
+            port: 6379
+            database: 0
+            timeout: 10000
+
+    # 邮件配置
+    mail:
+        host: smtp.example.com
+        port: 465
+        username: your-email@example.com
+        password: your-password
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    ssl:
+                        enable: true
+
+    # 静态资源配置
+    web:
+        resources:
+            static-locations: classpath:/static/
+            cache:
+                period: 0
+
+    # 文件上传配置
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 100MB
+
+    # DevTools 配置
+    devtools:
+        restart:
+            enabled: true
+            additional-paths: src/main/resources/static
+        livereload:
+            enabled: true
+    sql:
+        init:
+            mode: never
 
 # 日志配置
 logging:
-  level:
-    root: info
-    com.example.springdemo: debug
-    org.springframework.batch: debug
-  file:
-    name: logs/springdemo.log
+    level:
+        root: info
+        com.example.springdemo: debug
+        org.springframework.batch: debug
+    file:
+        name: logs/springdemo.log
 
 # 自定义配置
 app:
-  # 上传文件保存路径
-  upload-dir: ./uploads
-  # JWT配置
-  jwt:
-    secret: your-secret-key
-    expiration: 86400000 # 24小时
-  # 短信配置
-  sms:
-    accessKey: your-access-key
-    secretKey: your-secret-key
-    signName: 您的签名
-    templateCode: SMS_123456789 
+    # 上传文件保存路径
+    upload-dir: ./uploads
+    # JWT配置
+    jwt:
+        secret: springdemo-secret-key
+        expiration: 86400000 # 24小时
+    # 短信配置
+    sms:
+        accessKey: your-access-key
+        secretKey: your-secret-key
+        signName: 您的签名
+        templateCode: SMS_123456789

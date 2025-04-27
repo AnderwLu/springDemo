@@ -1,4 +1,4 @@
-package com.example.springdemo.web.controller;
+package com.example.springdemo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

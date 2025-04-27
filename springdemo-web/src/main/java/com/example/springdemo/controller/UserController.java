@@ -1,10 +1,11 @@
-package com.example.springdemo.web.controller;
+package com.example.springdemo.controller;
 
 import com.example.springdemo.common.result.Result;
 import com.example.springdemo.common.result.TableResultResponse;
 import com.example.springdemo.dao.dto.user.UserDto;
 import com.example.springdemo.service.userService.UserService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,7 +18,6 @@ import java.rmi.server.ExportException;
 
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 用户控制器

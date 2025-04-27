@@ -60,7 +60,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        HttpSecurity httpSecurity = http
                 // 关闭CSRF
                 .csrf(csrf -> csrf.disable())
                 // 基于表单的登录
@@ -75,16 +75,16 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll())
                 // 授权请求
-                .authorizeRequests(requests -> requests
+                .authorizeHttpRequests(requests -> requests
                         // 静态资源
-                        .antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/login.html").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/login.html").permitAll()
                         // 健康检查
-                        .antMatchers("/health").permitAll()
+                        .requestMatchers("/health").permitAll()
                         // API请求
-                        .antMatchers("/api/**").authenticated()
+                        .requestMatchers("/api/**").authenticated()
                         // 其他请求需要认证
                         .anyRequest().authenticated());
-        
+
         return http.build();
     }
-} 
+}

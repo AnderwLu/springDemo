@@ -1,8 +1,8 @@
 package com.example.springdemo.dao.entity.user;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
 /**

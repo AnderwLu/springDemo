@@ -18,19 +18,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,6 +56,12 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private Processors processors;
+
+  @Autowired
+  private JobRepository jobRepository;
+
+  @Autowired
+  private PlatformTransactionManager transactionManager;
 
   private Page<User> all(UserDto userDto, Pageable pageable) {
     Page<User> users = userRepository.findAll(new UserSpec(userDto), pageable);
@@ -118,7 +126,6 @@ public class UserServiceImpl implements UserService {
         .toJobParameters();
 
     jobLauncher.run(exportJob, jobParameters);
-
   }
 
   @Override
@@ -139,5 +146,4 @@ public class UserServiceImpl implements UserService {
     // 创建一个新的 PageImpl 对象，保留原始分页信息
     return new TableResultResponse<UserDto>(userDtos, userPage.getTotalElements());
   }
-
 }
